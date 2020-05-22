@@ -1,12 +1,15 @@
 package com.example.movieapp.view;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +21,7 @@ import com.example.movieapp.model.MovieDBResponse;
 import com.example.movieapp.model.Result;
 import com.example.movieapp.service.MovieDataService;
 import com.example.movieapp.service.RetrofitClient;
+import com.example.movieapp.viewmodel.MainActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +34,6 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String APP_KEY = "c21d7c6019755303168daf82d3f09d45";
 
     private List<Result> movies;
 
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private MainActivityViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
 
         getSupportActionBar().setTitle("TMDB Popular Movies Today");
+
+        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+
 
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
@@ -64,60 +72,33 @@ public class MainActivity extends AppCompatActivity {
 
     private void getPopularMovies() {
 
-        MovieDataService movieDataService = RetrofitClient.getService();
-
-        Call<MovieDBResponse> call = movieDataService.getPopularMovies(APP_KEY);
-        call.enqueue(new Callback<MovieDBResponse>() {
+        viewModel.getAllMovies().observe(this, new Observer<List<Result>>() {
             @Override
-            public void onResponse(Call<MovieDBResponse> call, Response<MovieDBResponse> response) {
-                MovieDBResponse movieDBResponse = response.body();
-                if (movieDBResponse != null && movieDBResponse.getResults() !=null){
-
-                    Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
-
-                    movies = response.body().getResults();
-
-                    movieAdapter = new MovieAdapter(MainActivity.this, movies);
-
-                    recyclerView.setItemAnimator(new SlideInUpAnimator());
-                    movieAdapter.setOnItemClickListener(new MovieAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View itemView, int position) {
-                            String name = movies.get(position).getOriginalTitle();
-                            Toast.makeText(MainActivity.this, name, Toast.LENGTH_SHORT).show();
-
-                            Intent intent = new Intent(MainActivity.this,MovieActivity.class);
-
-
-                            String title = movies.get(position).getOriginalTitle();
-                            String synopsis = movies.get(position).getOverview();
-                            String rating = String.valueOf(movies.get(position).getVoteAverage());
-                            String releaseDate = String.valueOf(movies.get(position).getReleaseDate());
-                            String image = movies.get(position).getPosterPath();
-
-                            intent.putExtra("title",title);
-                            intent.putExtra("synopsis",synopsis);
-                            intent.putExtra("rating",rating);
-                            intent.putExtra("releaseDate",releaseDate);
-                            intent.putExtra("image",image);
-
-                            startActivity(intent);
-
-                        }
-                    });
-                    recyclerView.setAdapter(movieAdapter);
-
-                    movieAdapter.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MovieDBResponse> call, Throwable t) {
-                call.cancel();
-                Log.i("error", Objects.requireNonNull(t.getLocalizedMessage()));
-                Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-
+            public void onChanged(List<Result> moviesFromLiveData) {
+                movies =moviesFromLiveData;
+                showOnRecyclerView();
             }
         });
+
+
+    }
+
+    public void showOnRecyclerView(){
+        movieAdapter = new MovieAdapter(this, movies);
+
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        } else {
+
+
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+
+
+        }
+
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(movieAdapter);
+        movieAdapter.notifyDataSetChanged();
     }
 }
