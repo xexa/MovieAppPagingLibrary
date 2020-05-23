@@ -1,5 +1,6 @@
 package com.example.movieapp.view;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -32,7 +33,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
 
     private List<Result> movies;
@@ -91,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
             recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         } else {
-
 
             recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
 
