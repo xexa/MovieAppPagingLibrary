@@ -1,12 +1,14 @@
 package com.example.movieapp.model;
 
 import android.app.Application;
+import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.movieapp.R;
 import com.example.movieapp.service.MovieDataService;
 import com.example.movieapp.service.RetrofitClient;
+import com.example.movieapp.view.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,8 @@ public class MovieRepository {
             public void onResponse(Call<MovieDBResponse> call, Response<MovieDBResponse> response) {
                 MovieDBResponse movieDBResponse = response.body();
 
+                Toast.makeText(application, "Success", Toast.LENGTH_SHORT).show();
+
                 if (movieDBResponse != null && movieDBResponse.getResults() != null){
 
                     movies = new ArrayList<>(movieDBResponse.getResults());
@@ -47,6 +51,8 @@ public class MovieRepository {
 
             @Override
             public void onFailure(Call<MovieDBResponse> call, Throwable t) {
+                call.cancel();
+                Toast.makeText(application, "Failed", Toast.LENGTH_SHORT).show();
 
             }
         });

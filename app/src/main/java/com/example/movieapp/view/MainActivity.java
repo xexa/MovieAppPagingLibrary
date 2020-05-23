@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity  {
             public void onRefresh() {
                 getPopularMovies();
             }
+
         });
     }
 
