@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recycler_view);
 
-        getSupportActionBar().setTitle("TMDB Popular Movies Today");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("TMDB Popular Movies Today");
 
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
@@ -76,28 +76,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Result> moviesFromLiveData) {
                 movies =moviesFromLiveData;
-                movieAdapter.setOnItemClickListener(new MovieAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View itemView, int position) {
 
-                        Intent intent =  new Intent(MainActivity.this,MovieActivity.class);
-
-                        String title = movies.get(position).getOriginalTitle();
-                        String synopsis = movies.get(position).getOverview();
-                        String rating = String.valueOf(movies.get(position).getVoteAverage());
-                        String releaseDate = String.valueOf(movies.get(position).getReleaseDate());
-                        String image = movies.get(position).getPosterPath();
-
-                        intent.putExtra("title",title);
-                        intent.putExtra("synopsis",synopsis);
-                        intent.putExtra("rating",rating);
-                        intent.putExtra("releaseDate",releaseDate);
-                        intent.putExtra("image",image);
-
-                        startActivity(intent);
-
-                    }
-                });
                 showOnRecyclerView();
             }
         });
@@ -121,6 +100,28 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(movieAdapter);
+        movieAdapter.setOnItemClickListener(new MovieAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View itemView, int position) {
+
+                Intent intent =  new Intent(MainActivity.this,MovieActivity.class);
+
+                String title = movies.get(position).getOriginalTitle();
+                String synopsis = movies.get(position).getOverview();
+                String rating = String.valueOf(movies.get(position).getVoteAverage());
+                String releaseDate = String.valueOf(movies.get(position).getReleaseDate());
+                String image = movies.get(position).getPosterPath();
+
+                intent.putExtra("title",title);
+                intent.putExtra("synopsis",synopsis);
+                intent.putExtra("rating",rating);
+                intent.putExtra("releaseDate",releaseDate);
+                intent.putExtra("image",image);
+
+                startActivity(intent);
+
+            }
+        });
         movieAdapter.notifyDataSetChanged();
     }
 }
