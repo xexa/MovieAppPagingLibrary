@@ -76,6 +76,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Result> moviesFromLiveData) {
                 movies =moviesFromLiveData;
+                movieAdapter.setOnItemClickListener(new MovieAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View itemView, int position) {
+
+                        Intent intent =  new Intent(MainActivity.this,MovieActivity.class);
+
+                        String title = movies.get(position).getOriginalTitle();
+                        String synopsis = movies.get(position).getOverview();
+                        String rating = String.valueOf(movies.get(position).getVoteAverage());
+                        String releaseDate = String.valueOf(movies.get(position).getReleaseDate());
+                        String image = movies.get(position).getPosterPath();
+
+                        intent.putExtra("title",title);
+                        intent.putExtra("synopsis",synopsis);
+                        intent.putExtra("rating",rating);
+                        intent.putExtra("releaseDate",releaseDate);
+                        intent.putExtra("image",image);
+
+                        startActivity(intent);
+
+                    }
+                });
                 showOnRecyclerView();
             }
         });
