@@ -61,4 +61,10 @@ dependencies {
 // Testing
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
 
+    //paging library
+
+    def paging_version = "2.1.2"
+
+    implementation "androidx.paging:paging-runtime:$paging_version"
+
 }
